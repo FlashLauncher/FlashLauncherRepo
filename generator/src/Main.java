@@ -29,6 +29,8 @@ public class Main {
     public static final HashMap<Version, JsonList> mainRepo = new HashMap<>();
     public static final HashMap<Version, JsonList> userRepo = new HashMap<>();
 
+    public static int mi = 0, ui = 0;
+
     static {
         ArrayList<Version> launcherVersions = new ArrayList<>();
         for (final String ver : new String[]{ "0.1.7" }) {
@@ -76,12 +78,14 @@ public class Main {
             }
             System.out.println("Exporting ...");
             for (final Map.Entry<Version, JsonList> e : mainRepo.entrySet()) {
-                final String hash = save("main/main-", e.getValue());
-                main.getAsGroup(e.getKey().toString()).put(hash, "main-" + hash + ".json");
+                final String hash = save("main/main-" + mi, e.getValue());
+                main.getAsGroup(e.getKey().toString()).put(hash, "main-" + mi + ".json");
+                mi++;
             }
             for (final Map.Entry<Version, JsonList> e : userRepo.entrySet()) {
-                final String hash = save("user/user-", e.getValue());
-                user.getAsGroup(e.getKey().toString()).put(hash, "user-" + hash + ".json");
+                final String hash = save("user/user-" + ui, e.getValue());
+                user.getAsGroup(e.getKey().toString()).put(hash, "user-" + ui + ".json");
+                ui++;
             }
             new FileOutputStream("main/main.ini") {{
                 write(main.toString().getBytes(StandardCharsets.UTF_8));
@@ -100,7 +104,7 @@ public class Main {
     public static String save(final String prefix, final JsonList l) throws NoSuchAlgorithmException, IOException {
         final byte[] d = l.toString().getBytes(StandardCharsets.UTF_8);
         final String h = Core.hashToHex("SHA-256", d);
-        final File f = new File(prefix + h + ".json");
+        final File f = new File(prefix + ".json");
         if (f.exists()) f.delete();
         new FileOutputStream(f) {{
             write(d);
