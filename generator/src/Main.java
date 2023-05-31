@@ -19,7 +19,7 @@ import java.util.Map;
 public class Main {
     public static WebClient c = new WebClient() {{ allowRedirect = true; }};
 
-    public static final FixedSet<String> official = new FixedSet<>(new String[] { "FlashLauncher/ExampleJavaPlugin" });
+    public static final FixedSet<String> official = new FixedSet<>(new String[] { "FlashLauncher/ExampleJavaPlugin", "FlashLauncher/FlashLauncherRepo" });
     public static final FixedSet<String> ignored = new FixedSet<>(new String[] {  });
     public static final FixedSet<Version> versions;
 
@@ -41,7 +41,10 @@ public class Main {
 
     public static void main(final String[] args) {
         try {
-            for (final File f : new File("./").listFiles())
+            for (final File f : new File("main").listFiles())
+                if ((f.getName().startsWith("main-") || f.getName().startsWith("user-")) && f.getName().endsWith(".json"))
+                    f.delete();
+            for (final File f : new File("user").listFiles())
                 if ((f.getName().startsWith("main-") || f.getName().startsWith("user-")) && f.getName().endsWith(".json"))
                     f.delete();
 
@@ -54,7 +57,7 @@ public class Main {
                 r.connect();
                 r.readAll();
                 r.close();
-                
+
                 try {
                     System.out.println("Parsing ...");
                     final JsonDict d = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsDict();
@@ -73,18 +76,18 @@ public class Main {
             }
             System.out.println("Exporting ...");
             for (final Map.Entry<Version, JsonList> e : mainRepo.entrySet()) {
-                final String hash = save("main-", e.getValue());
+                final String hash = save("main/main-", e.getValue());
                 main.getAsGroup(e.getKey().toString()).put(hash, "main-" + hash + ".json");
             }
             for (final Map.Entry<Version, JsonList> e : userRepo.entrySet()) {
-                final String hash = save("user-", e.getValue());
+                final String hash = save("user/user-", e.getValue());
                 user.getAsGroup(e.getKey().toString()).put(hash, "user-" + hash + ".json");
             }
-            new FileOutputStream("main.ini") {{
+            new FileOutputStream("main/main.ini") {{
                 write(main.toString().getBytes(StandardCharsets.UTF_8));
                 close();
             }};
-            new FileOutputStream("user.ini") {{
+            new FileOutputStream("user/user.ini") {{
                 write(user.toString().getBytes(StandardCharsets.UTF_8));
                 close();
             }};
