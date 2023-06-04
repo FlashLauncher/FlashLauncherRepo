@@ -1,5 +1,6 @@
 import Utils.Core;
 import Utils.IniGroup;
+import Utils.ListMap;
 import Utils.Version;
 import Utils.fixed.FixedSet;
 import Utils.json.Json;
@@ -26,8 +27,8 @@ public class Main {
     public static final IniGroup main = new IniGroup();
     public static final IniGroup user = new IniGroup();
 
-    public static final HashMap<Version, JsonList> mainRepo = new HashMap<>();
-    public static final HashMap<Version, JsonList> userRepo = new HashMap<>();
+    public static final ListMap<Version, JsonList> mainRepo = new ListMap<>();
+    public static final ListMap<Version, JsonList> userRepo = new ListMap<>();
 
     public static int mi = 0, ui = 0;
 
@@ -79,12 +80,12 @@ public class Main {
             System.out.println("Exporting ...");
             for (final Map.Entry<Version, JsonList> e : mainRepo.entrySet()) {
                 final String hash = save("main/main-" + mi, e.getValue());
-                main.getAsGroup(e.getKey().toString()).put(hash, "main-" + mi + ".json");
+                main.getAsGroup(e.getKey().toString()).put(hash, "main/main-" + mi + ".json");
                 mi++;
             }
             for (final Map.Entry<Version, JsonList> e : userRepo.entrySet()) {
                 final String hash = save("user/user-" + ui, e.getValue());
-                user.getAsGroup(e.getKey().toString()).put(hash, "user-" + ui + ".json");
+                user.getAsGroup(e.getKey().toString()).put(hash, "user/user-" + ui + ".json");
                 ui++;
             }
             new FileOutputStream("main/main.ini") {{

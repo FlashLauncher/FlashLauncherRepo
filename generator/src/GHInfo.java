@@ -1,4 +1,5 @@
 import Utils.IniGroup;
+import Utils.ListMap;
 import Utils.Pair;
 import Utils.Version;
 import Utils.json.Json;
@@ -78,7 +79,7 @@ public class GHInfo {
                 dependencies.put(name, version);
             }
         final String launcherVersions = dependencies.getAsStringOrDefault("flash-launcher", "*");
-        final HashMap<Version, JsonList> repo = Main.official.contains(fullName) ? Main.mainRepo : Main.userRepo;
+        final ListMap<Version, JsonList> repo = Main.official.contains(fullName) ? Main.mainRepo : Main.userRepo;
         boolean added = false;
         for (final Version ver : Main.versions) {
             if (!ver.isCompatibility(launcherVersions)) continue;
