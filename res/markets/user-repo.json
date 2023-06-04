@@ -1,6 +1,6 @@
 {
   "name": "User Repo",
-  "type": "github",
+  "type": "github-chunked",
   "repo": "FlashLauncher/FlashLauncherRepo",
   "path": "user/user.ini"
 }
