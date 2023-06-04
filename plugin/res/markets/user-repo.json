@@ -1,6 +1,6 @@
 {
   "name": "User Repo",
   "type": "github",
-  "full_name": "FlashLauncher/FlashLauncherRepo",
+  "repo": "FlashLauncher/FlashLauncherRepo",
   "path": "user/user.ini"
 }
