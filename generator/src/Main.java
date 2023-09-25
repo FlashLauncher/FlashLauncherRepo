@@ -138,6 +138,7 @@ public class Main {
                     l.add(new JsonDict() {{
                         put("id", item.id);
                         put("name", item.name);
+                        put("version", item.version);
                         put("author", item.author);
                         if (item.icon != null)
                             put("icon", "https://raw.githubusercontent.com/" + item.repo + "/" + item.commit + "/" + item.icon);
