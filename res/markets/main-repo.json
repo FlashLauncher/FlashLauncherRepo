@@ -1,6 +1,7 @@
 {
   "name": "Main Repo",
   "type": "github-chunked",
+  "icon": "flash-launcher://images/grass.png",
   "repo": "FlashLauncher/FlashLauncherRepo",
   "path": "main/main.ini"
 }
