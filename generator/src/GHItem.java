@@ -84,7 +84,7 @@ public class GHItem {
                 String ver = "*";
 
                 if (dependencies != null)
-                    for (final String dep : dependencies.split(",")) {
+                    for (final String dep : dependencies.split(";")) {
                         final int i = dep.indexOf(':');
                         if (i == -1)
                             continue;
