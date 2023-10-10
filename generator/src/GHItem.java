@@ -96,7 +96,7 @@ public class GHItem {
 
                 String i = null;
                 for (final GHFile f1 : files)
-                    if (icon.contains(f.path)) {
+                    if (icon.contains(f1.path)) {
                         i = f1.path;
                         break;
                     }
