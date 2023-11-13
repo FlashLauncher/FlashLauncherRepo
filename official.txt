@@ -1,2 +1,5 @@
-FlashLauncher/FlashLauncherRepo
 FlashLauncher/FlashLauncher
+FlashLauncher/AdvancedAPICore
+FlashLauncher/FlashLauncherRepo
+FlashLauncher/JavaSupport
+FlashLauncher/MinecraftSupport
