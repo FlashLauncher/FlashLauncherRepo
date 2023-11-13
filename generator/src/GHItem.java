@@ -43,6 +43,8 @@ public class GHItem {
         this.commit = commit;
         this.url = url;
 
+        final boolean l = repo.equals("FlashLauncher/FlashLauncher");
+
         System.out.println(" -  -  - Commit: " + commit);
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -56,7 +58,7 @@ public class GHItem {
         for (final JsonDict fd : d.getAsList("tree").toArray(new JsonDict[0]))
             files.add(new GHFile(this, fd));
         for (final GHFile f : files)
-            if (info.contains(f.path)) {
+            if (l ? f.path.equals("res/fl-info.ini") : info.contains(f.path)) {
                 System.out.println(" -  -  - Info: " + f.path);
                 os = new ByteArrayOutputStream();
                 //c.open("GET", new URI("https://api.github.com/repos/" + repo + "/contents/" + f.path + "?ref=" + commit), os, true).auto();
