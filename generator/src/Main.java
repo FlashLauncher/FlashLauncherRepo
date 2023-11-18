@@ -97,10 +97,10 @@ public class Main {
                         li = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList();
                         break;
                     }
-                    final long s = Long.parseLong(r.headers.get("X-RateLimit-Reset")) - System.currentTimeMillis() / 1000;
-                    System.out.println("Wait " + s + "s");
+                    final long s = Long.parseLong(r.headers.get("X-RateLimit-Reset")) * 1000 - System.currentTimeMillis();
+                    System.out.println("Code: " + r.getResponseCode() + ". Wait " + (s / 1000) + "s");
                     if (s > 0)
-                        Thread.sleep(s * 1000);
+                        Thread.sleep(s);
                 }
                 if (li.isEmpty())
                     continue;
