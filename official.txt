@@ -3,3 +3,4 @@ FlashLauncher/AdvancedAPICore
 FlashLauncher/FlashLauncherRepo
 FlashLauncher/JavaSupport
 FlashLauncher/MinecraftSupport
+FlashLauncher/FabricMCSupport
