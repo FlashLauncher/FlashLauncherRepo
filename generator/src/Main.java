@@ -5,8 +5,10 @@ import Utils.Version;
 import Utils.fixed.FixedSet;
 import Utils.json.Json;
 import Utils.json.JsonDict;
+import Utils.json.JsonElement;
 import Utils.json.JsonList;
 import Utils.web.WebClient;
+import Utils.web.WebResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -87,9 +89,19 @@ public class Main {
                 }
                 System.out.println(" -  - " + fn);
                 os = new ByteArrayOutputStream();
-                //c.open("GET", new URI("https://api.github.com/repos/" + fn + "/tags"), os, false).auto();
-                c.open("GET", new URI("https://api.github.com/repos/" + fn + "/releases"), os, true).auto();
-                final JsonList li = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList();
+                final JsonList li;
+                while (true) {
+                    final WebResponse r = c.open("GET", new URI("https://api.github.com/repos/" + fn + "/releases"), os, true);
+                    r.auto();
+                    if (r.getResponseCode() == 200) {
+                        li = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList();
+                        break;
+                    }
+                    final long s = Long.parseLong(r.headers.get("X-RateLimit-Reset")) - System.currentTimeMillis() / 1000;
+                    System.out.println("Wait " + s + "s");
+                    if (s > 0)
+                        Thread.sleep(s * 1000);
+                }
                 if (li.isEmpty())
                     continue;
                 for (final JsonDict di : li.toArray(new JsonDict[0]))
