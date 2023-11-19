@@ -3,16 +3,54 @@ import Utils.Version;
 import Utils.json.Json;
 import Utils.json.JsonDict;
 import Utils.web.WebClient;
+import Utils.web.WebResponse;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class GHItem {
-    public static final WebClient c = new WebClient() {{ allowRedirect = true; }};
+    public static final WebClient c = new WebClient() {
+        private WebResponse superOpen(final String method, final URL urlAddr, final OutputStream outputStream, final boolean autoCloseStream) throws IOException {
+            return super.open(method, urlAddr, outputStream, autoCloseStream);
+        }
+
+        @Override
+        public WebResponse open(final String method, final URL urlAddr, final OutputStream outputStream, final boolean autoCloseStream) throws IOException {
+            return new WebResponse(outputStream) {
+                @Override public void connect() throws IOException, InterruptedException {}
+                @Override public void readAll() throws IOException, InterruptedException {}
+                @Override public void close() throws IOException { outputStream.flush(); if (autoCloseStream) outputStream.close(); }
+
+                @Override
+                public void auto() throws IOException, InterruptedException {
+                    while (true) {
+                        final ByteArrayOutputStream sos = new ByteArrayOutputStream();
+                        final WebResponse r = superOpen(method, urlAddr, sos, true);
+                        r.auto();
+                        if (r.getResponseCode() == 200) {
+                            os.write(sos.toByteArray(), 0, sos.size());
+                            break;
+                        }
+                        final long s = Long.parseLong(r.headers.get("X-RateLimit-Reset")) * 1000 - System.currentTimeMillis();
+                        System.out.println("Code: " + r.getResponseCode() + ". Wait " + (s / 1000) + "s");
+                        if (s > 0)
+                            Thread.sleep(s);
+                    }
+                    close();
+                }
+            };
+        }
+
+
+        { allowRedirect = true; }
+    };
     public static final List<String>
             info = Arrays.asList(
                     "fl-plugin.ini",
@@ -36,7 +74,7 @@ public class GHItem {
 
     public final ArrayList<GHFile> files = new ArrayList<>();
 
-    public GHItem(final Main main, final String repo, final String tag, final String commit, final String url) throws Exception {
+    public GHItem(final Main main, final String repo, final String tag, final String commit, final String url, final ArrayList<Version> vl) throws Exception {
         this.m = main;
         this.repo = repo;
         this.tag = tag;
@@ -110,13 +148,18 @@ public class GHItem {
                         commit, i
                 );
 
-                for (final Version v : m.versions)
-                    if (v.isCompatibility(ver))
+                for (int i1 = vl.size() - 1; i1 >= 0; i1--) {
+                    final Version v = vl.get(i1);
+                    if (v.isCompatibility(ver)) {
+                        System.out.println(" -  -  -  - " + v);
+                        vl.remove(i1);
                         (
                                 main.official.contains(repo) ?
                                         main.officials.get(v) :
                                         main.communities.get(v)
                         ).add(item);
+                    }
+                }
                 return;
             }
     }

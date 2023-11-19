@@ -67,7 +67,7 @@ public class Main {
             blocked = new FixedSet<>(bl.toArray(new String[0]));
         }
 
-        final WebClient c = new WebClient() {{ allowRedirect = true; }};
+        final WebClient c = GHItem.c;
 
         System.out.println("Searching:");
         int page = 1;
@@ -88,32 +88,38 @@ public class Main {
                     continue;
                 }
                 System.out.println(" -  - " + fn);
+                final JsonList rl, tl;
+
+                // Releases
                 os = new ByteArrayOutputStream();
-                final JsonList li;
-                while (true) {
-                    final WebResponse r = c.open("GET", new URI("https://api.github.com/repos/" + fn + "/releases"), os, true);
-                    r.auto();
-                    if (r.getResponseCode() == 200) {
-                        li = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList();
-                        break;
-                    }
-                    final long s = Long.parseLong(r.headers.get("X-RateLimit-Reset")) * 1000 - System.currentTimeMillis();
-                    System.out.println("Code: " + r.getResponseCode() + ". Wait " + (s / 1000) + "s");
-                    if (s > 0)
-                        Thread.sleep(s);
-                }
-                if (li.isEmpty())
+                WebResponse r = c.open("GET", new URI("https://api.github.com/repos/" + fn + "/releases"), os, true);
+                r.auto();
+                rl = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList();
+
+                if (rl.isEmpty())
                     continue;
-                for (final JsonDict di : li.toArray(new JsonDict[0]))
-                    for (final JsonDict a : di.getAsList("assets").toArray(new JsonDict[0])) {
-                        final String fileName = a.getAsString("name"), tagName = di.getAsString("tag_name");
+
+                os = new ByteArrayOutputStream();
+
+                r = c.open("GET", new URI("https://api.github.com/repos/" + fn + "/tags"), os, true);
+                r.auto();
+                tl = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList();
+
+                if (tl.isEmpty())
+                    continue;
+
+                os = null;
+
+                final ArrayList<Version> vl = new ArrayList<>(versions);
+                for (final JsonDict release : rl.toArray(new JsonDict[0]))
+                    for (final JsonDict a : release.getAsList("assets").toArray(new JsonDict[0])) {
+                        final String fileName = a.getAsString("name"), tagName = release.getAsString("tag_name");
                         if (fileName.endsWith(".jar")) {
-                            os = new ByteArrayOutputStream();
-                            c.open("GET", new URI("https://api.github.com/repos/" + fn + "/tags"), os, true).auto();
-                            for (final JsonDict tag : Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList().toArray(new JsonDict[0]))
+                            for (final JsonDict tag : tl.toArray(new JsonDict[0]))
                                 if (tag.getAsString("name").equals(tagName)) {
-                                    new GHItem(this, fn, tagName, tag.getAsDict("commit").getAsString("sha"), a.getAsString("browser_download_url"));
-                                    continue rl;
+                                    new GHItem(this, fn, tagName, tag.getAsDict("commit").getAsString("sha"), a.getAsString("browser_download_url"), vl);
+                                    if (vl.isEmpty())
+                                        continue rl;
                                 }
                         }
                     }
@@ -141,10 +147,11 @@ public class Main {
         try (final FileOutputStream osm = new FileOutputStream(f)) {
             System.out.println(" - " + name);
             final IniGroup m = new IniGroup();
+            int p = 0;
             for (final Map.Entry<Version, ArrayList<Item>> e : d.entrySet()) {
                 System.out.println(" -  - " + e.getKey());
                 final IniGroup vg = m.newGroup(e.getKey().toString());
-                int p = 0, i = 0;
+                int i = 0;
                 final JsonList l = new JsonList();
                 for (final Item item : e.getValue()) {
                     l.add(new JsonDict() {{
@@ -165,16 +172,18 @@ public class Main {
                     if (++i == 50) {
                         i = 1;
                         final byte[] r = l.toString().getBytes(StandardCharsets.UTF_8);
-                        vg.put(Core.hashToHex("sha-256", r), name + "/" + name + "-" + p + ".json");
-                        try (final FileOutputStream os = new FileOutputStream(name + "/" + name + "-" + p++ + ".json")) {
+                        final String fn = Core.hashToHex("sha-256", r);
+                        vg.put(fn, name + "/" + fn + ".json");
+                        try (final FileOutputStream os = new FileOutputStream(name + "/" + fn + ".json")) {
                             os.write(r);
                         }
                     }
                 }
                 if (!l.isEmpty()) {
                     final byte[] r = l.toString().getBytes(StandardCharsets.UTF_8);
-                    vg.put(Core.hashToHex("sha-256", r), name + "/" + name + "-" + p + ".json");
-                    try (final FileOutputStream os = new FileOutputStream(name + "/" + name + "-" + p + ".json")) {
+                    final String fn = Core.hashToHex("sha-256", r);
+                    vg.put(fn, name + "/" + fn + ".json");
+                    try (final FileOutputStream os = new FileOutputStream(name + "/" + fn + ".json")) {
                         os.write(r);
                     }
                 }
