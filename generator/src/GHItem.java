@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class GHItem {
     public static final WebClient c = new WebClient() {
@@ -24,7 +25,7 @@ public class GHItem {
         @Override
         public WebResponse open(final String method, final URL urlAddr, final OutputStream outputStream, final boolean autoCloseStream) throws IOException {
             return new WebResponse(outputStream) {
-                @Override public void connect() throws IOException, InterruptedException {}
+                @Override public void connect(final Map<String, String> headers, final byte[] data) throws IOException, InterruptedException {}
                 @Override public void readAll() throws IOException, InterruptedException {}
                 @Override public void close() throws IOException { outputStream.flush(); if (autoCloseStream) outputStream.close(); }
 
