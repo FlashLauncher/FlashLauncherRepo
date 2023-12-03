@@ -75,7 +75,7 @@ public class Main {
             System.gc();
             System.out.println(" - page " + page + ":");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            c.open("GET", new URI("https://api.github.com/search/repositories?q=topic:mcflashlauncher-plugin&per_page=100&page=" + (page++)), os, true).auto();
+            c.open("GET", new URI("https://api.github.com/search/repositories?q=topic:mcflashlauncher-plugin&sort=updated&per_page=100&page=" + (page++)), os, true).auto();
 
             final JsonDict d = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsDict();
             final JsonList l = d.getAsList("items");
