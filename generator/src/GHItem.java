@@ -1,16 +1,18 @@
-import Utils.IniGroup;
-import Utils.Version;
+import Utils.*;
 import Utils.json.Json;
 import Utils.json.JsonDict;
 import Utils.web.WebClient;
 import Utils.web.WebResponse;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,11 +36,39 @@ public class GHItem {
                     while (true) {
                         final ByteArrayOutputStream sos = new ByteArrayOutputStream();
                         final WebResponse r = superOpen(method, urlAddr, sos, true);
-                        r.auto();
+                        final String h;
+                        String h1 = null;
+                        try {
+                            h1 = Core.hashStringToHex("SHA-256", urlAddr.toString());
+                        } catch (final NoSuchAlgorithmException ex) {
+                            ex.printStackTrace();
+                        }
+                        h = h1;
+
+
+                        File f = h == null ? null : new File(".cache/" + h), f2 = h == null ? null : new File(".cache/" + h + ".tag");
+
+                        if (h != null && f2.exists())
+                            r.auto(new ListMap<String, String>() {{
+                                put("If-None-Match", new String(IO.readFully(f2), StandardCharsets.UTF_8));
+                           }}, NO_DATA);
+                        else
+                            r.auto();
+
                         if (r.getResponseCode() == 200) {
-                            os.write(sos.toByteArray(), 0, sos.size());
+                            os.write(sos.toByteArray());
+                            if (h != null && r.headers.containsKey("ETag")) {
+                                Files.write(f2.toPath(), r.headers.get("ETag").getBytes(StandardCharsets.UTF_8));
+                                Files.write(f.toPath(), sos.toByteArray());
+                            }
                             break;
                         }
+
+                        if (r.getResponseCode() == 304) {
+                            os.write(IO.readFully(f));
+                            break;
+                        }
+
                         final long s = Long.parseLong(r.headers.get("X-RateLimit-Reset")) * 1000 - System.currentTimeMillis();
                         System.out.println("Code: " + r.getResponseCode() + ". Wait " + (s / 1000) + "s");
                         if (s > 0)
