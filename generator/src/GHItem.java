@@ -50,14 +50,12 @@ public class GHItem {
 
                         File f = h == null ? null : new File(".cache/" + h), f2 = h == null ? null : new File(".cache/" + h + ".tag");
 
-                        if (h != null && f2.exists())
-                            r.auto(new ListMap<String, String>() {{
+                        r.auto(new ListMap<String, String>() {{
+                            if (h != null && f2.exists())
                                 put("If-None-Match", new String(IO.readFully(f2), StandardCharsets.UTF_8));
-                                if (token != null)
-                                    put("Authorization", "Bearer " + token);
-                           }}, NO_DATA);
-                        else
-                            r.auto();
+                            if (token != null)
+                                put("Authorization", "Bearer " + token);
+                        }}, NO_DATA);
 
                         if (r.getResponseCode() == 200) {
                             os.write(sos.toByteArray());
