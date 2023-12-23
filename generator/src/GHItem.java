@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 public class GHItem {
+    public static final String token = System.getenv("token");
+
     public static final WebClient c = new WebClient() {
         private WebResponse superOpen(final String method, final URL urlAddr, final OutputStream outputStream, final boolean autoCloseStream) throws IOException {
             return super.open(method, urlAddr, outputStream, autoCloseStream);
@@ -51,6 +53,8 @@ public class GHItem {
                         if (h != null && f2.exists())
                             r.auto(new ListMap<String, String>() {{
                                 put("If-None-Match", new String(IO.readFully(f2), StandardCharsets.UTF_8));
+                                if (token != null)
+                                    put("Authorization", "Bearer " + token);
                            }}, NO_DATA);
                         else
                             r.auto();
@@ -67,6 +71,10 @@ public class GHItem {
                         if (r.getResponseCode() == 304) {
                             os.write(IO.readFully(f));
                             break;
+                        }
+
+                        if (r.getResponseCode() == 403) {
+                            System.out.println(r.headers);
                         }
 
                         final long s = Long.parseLong(r.headers.get("X-RateLimit-Reset")) * 1000 - System.currentTimeMillis();
