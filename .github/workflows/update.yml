@@ -29,5 +29,11 @@ jobs:
         with:
           java-version: '21'
 
+      - name: Set up
+        run: mkdir build
+
+      - name: Build
+        run: javac -d build -cp "FlashLauncher.jar:AdvancedAPICore.jar" -sourcepath generator/src *.java
+
       - name: Start
-        run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "FlashLauncher.jar:AdvancedAPICore.jar:generator/src" Main
+        run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "FlashLauncher.jar:AdvancedAPICore.jar:build" Main
