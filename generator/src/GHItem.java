@@ -54,8 +54,9 @@ public class GHItem {
                             if (h != null && f2.exists())
                                 put("If-None-Match", new String(IO.readFully(f2), StandardCharsets.UTF_8));
                             if (token != null) {
-                                put("Content-Type", "application/vnd.github.v3+json");
+                                put("Content-Type", "application/vnd.github+json");
                                 put("Authorization", "Bearer " + token);
+                                put("X-GitHub-Api-Version", "2022-11-28");
                             }
                         }}, NO_DATA);
 
