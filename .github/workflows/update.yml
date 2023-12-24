@@ -17,5 +17,15 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '21'
+      - uses: dawidd6/action-download-artifact@v3
+        with:
+          name: FlashLauncher.jar
+          repo: FlashLauncher/FlashLauncher
+          skip_unpack: true
+      - uses: dawidd6/action-download-artifact@v3
+        with:
+          name: AdvancedAPICore.jar
+          repo: FlashLauncher/AdvancedAPICore.jar
+          skip_unpack: true
       - run: echo "Started"
-      - run: java generator/src/Main.java
+      - run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "FlashLauncher.jar:AdvancedAPICore.jar:generator/src" Main.java
