@@ -38,3 +38,14 @@ jobs:
 
       - name: Start
         run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "${{ env.path }}/FlashLauncher.jar:${{ env.path }}/AdvancedAPICore.jar:${{ env.path }}/build" Main
+
+      - name: Push
+        run: |
+          git config user.name "Repo Updater Bot"
+          git config user.email "<>"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout "${GITHUB_REF:11}"
+          git add main/*
+          git add user/*
+          git diff --quiet && git diff --staged --quiet || git commit -am '[Update repo]'
+          git push
