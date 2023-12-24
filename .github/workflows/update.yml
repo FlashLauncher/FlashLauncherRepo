@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download FlashLauncher
-        run: wget https://github.com/FlashLauncher/releases/latest/download/FlashLauncher.jar
+        run: wget https://github.com/FlashLauncher/FlashLauncher/releases/latest/download/FlashLauncher.jar
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
