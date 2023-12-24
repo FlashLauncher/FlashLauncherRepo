@@ -1,6 +1,8 @@
 name: FL Repo Updater
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: []
+on:
+  schedule:
+    - cron: '0 12 * * *'
 jobs:
   update:
     runs-on: ubuntu-latest
