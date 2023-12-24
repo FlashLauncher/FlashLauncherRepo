@@ -29,13 +29,11 @@ jobs:
         with:
           java-version: '21'
 
-      - run: ls ~
-
       - name: Set up
-        run: mkdir build
+        run: mkdir ~/build
 
       - name: Build
-        run: javac -d build -classpath "~/FlashLauncher.jar:~/AdvancedAPICore.jar:" -sourcepath generator/src generator/src/*.java
+        run: javac -verbose -d ~/build -classpath "~/FlashLauncher.jar:~/AdvancedAPICore.jar:" -sourcepath generator/src generator/src/*.java
 
       - name: Start
-        run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "FlashLauncher.jar:AdvancedAPICore.jar:build" Main
+        run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "~/FlashLauncher.jar:~/AdvancedAPICore.jar:~/build" Main
