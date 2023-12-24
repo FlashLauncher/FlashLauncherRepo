@@ -53,8 +53,10 @@ public class GHItem {
                         r.auto(new ListMap<String, String>() {{
                             if (h != null && f2.exists())
                                 put("If-None-Match", new String(IO.readFully(f2), StandardCharsets.UTF_8));
-                            if (token != null)
+                            if (token != null) {
+                                put("Content-Type", "application/vnd.github.v3+json");
                                 put("Authorization", "Bearer " + token);
+                            }
                         }}, NO_DATA);
 
                         if (r.getResponseCode() == 200) {
