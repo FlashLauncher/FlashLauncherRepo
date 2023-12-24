@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download FlashLauncher
-        run: gh release download --repo FlashLauncher/FlashLauncher --pattern FlashLauncher.jar
+        run: gh release download --repo FlashLauncher/FlashLauncher --pattern FlashLauncher.jar --directory ~
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download AdvancedAPICore
-        run: gh release download --repo FlashLauncher/AdvancedAPICore --pattern AdvancedAPICore.jar
+        run: gh release download --repo FlashLauncher/AdvancedAPICore --pattern AdvancedAPICore.jar --directory ~
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -29,13 +29,13 @@ jobs:
         with:
           java-version: '21'
 
-      - run: ls
+      - run: ls ~
 
       - name: Set up
         run: mkdir build
 
       - name: Build
-        run: javac -d build -cp "./FlashLauncher.jar:./AdvancedAPICore.jar" -sourcepath generator/src generator/src/*.java
+        run: javac -d build -cp "~/FlashLauncher.jar:~/AdvancedAPICore.jar" -sourcepath generator/src generator/src/*.java
 
       - name: Start
         run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "FlashLauncher.jar:AdvancedAPICore.jar:build" Main
