@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download FlashLauncher
-        run: gh release download -R FlashLauncher/FlashLauncher -p FlashLauncher.jar
+        run: wget https://github.com/FlashLauncher/releases/latest/download/FlashLauncher.jar
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -22,8 +22,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: echo "Setup ${{ github.repository }}"
       - uses: actions/checkout@v2
+
+      - name: Set up JDK
       - uses: actions/setup-java@v1
         with:
           java-version: '21'
