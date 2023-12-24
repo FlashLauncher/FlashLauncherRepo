@@ -37,7 +37,7 @@ jobs:
         run: javac -d "${{ env.path }}/build" -classpath "${{ env.path }}/FlashLauncher.jar:${{ env.path }}/AdvancedAPICore.jar" -sourcepath generator/src generator/src/*.java
 
       - name: Start
-        run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "${{ env.path }}/FlashLauncher.jar:${{ env.path }}/AdvancedAPICore.jar:${{ env.path }}/build" Main
+        run: java -Dtoken="${{ secrets.GITHUB_TOKEN }}" -cp "${{ env.path }}/FlashLauncher.jar:${{ env.path }}/AdvancedAPICore.jar:${{ env.path }}/build" Main
 
       - name: Push
         run: |
