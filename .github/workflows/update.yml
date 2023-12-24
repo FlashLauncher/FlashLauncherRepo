@@ -12,14 +12,21 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+      - name: Download FlashLauncher
+        run: gh release download -R FlashLauncher/FlashLauncher -p FlashLauncher.jar
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download AdvancedAPICore
+        run: gh release download -R FlashLauncher/AdvancedAPICore -p AdvancedAPICore.jar
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - run: echo "Setup ${{ github.repository }}"
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
           java-version: '21'
 
-      - name: Download FlashLauncher
-        run: gh release download -R FlashLauncher/FlashLauncher -p FlashLauncher.jar
-
-      - name: Started
+      - name: Start
         run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "FlashLauncher.jar:AdvancedAPICore.jar:generator/src" Main.java
