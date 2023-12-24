@@ -31,7 +31,7 @@ jobs:
 
       - name: Set up
         run: mkdir ~/build
-      - run: echo "path=~" >> $GITHUB_ENV
+      - run: echo "path={~}" >> $GITHUB_ENV
 
       - name: Build
         run: javac -d "${{ env.path }}/build" -classpath "${{ env.path }}/FlashLauncher.jar:${{ env.path }}/AdvancedAPICore.jar" -sourcepath generator/src generator/src/*.java
