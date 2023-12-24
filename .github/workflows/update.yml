@@ -30,4 +30,4 @@ jobs:
           java-version: '21'
 
       - name: Start
-        run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "FlashLauncher.jar:AdvancedAPICore.jar:generator/src" Main.java
+        run: java -Dtoken="Bearer ${{ secrets.GITHUB_TOKEN }}" -cp "FlashLauncher.jar:AdvancedAPICore.jar:generator/src" Main
