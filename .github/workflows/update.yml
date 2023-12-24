@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download FlashLauncher
-        run: gh release download --repo FlashLauncher/FlashLauncher --pattern FlashLauncher.jar
+        run: gh release download --repo FlashLauncher/FlashLauncher --pattern *.jar
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download AdvancedAPICore
-        run: gh release download --repo FlashLauncher/AdvancedAPICore --pattern AdvancedAPICore.jar
+        run: gh release download --repo FlashLauncher/AdvancedAPICore --pattern *.jar
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
