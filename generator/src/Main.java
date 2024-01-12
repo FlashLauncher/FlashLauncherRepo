@@ -29,6 +29,12 @@ public class Main {
     ;
 
     public Main() throws Exception {
+        {
+            final File cd = new File(".cache");
+            if (!cd.exists())
+                cd.mkdirs();
+        }
+
         try (final Scanner s = new Scanner(new File("versions.txt"))) {
             final ArrayList<Version> bl = new ArrayList<>();
             while (s.hasNextLine()) {
