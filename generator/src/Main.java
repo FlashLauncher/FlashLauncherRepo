@@ -9,15 +9,13 @@ import Utils.json.JsonElement;
 import Utils.json.JsonList;
 import Utils.web.WebClient;
 import Utils.web.WebResponse;
+import Utils.web.sURL;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(final String[] args) throws Exception { new Main(); }
@@ -75,7 +73,7 @@ public class Main {
             System.gc();
             System.out.println(" - page " + page + ":");
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            c.open("GET", new URI("https://api.github.com/search/repositories?q=topic:mcflashlauncher-plugin&sort=updated&per_page=100&page=" + (page++)), os, true).auto();
+            c.open("GET", new sURL("https://api.github.com/search/repositories?q=topic:mcflashlauncher-plugin&sort=updated&per_page=100&page=" + (page++)), os, true).auto();
 
             final JsonDict d = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsDict();
             final JsonList l = d.getAsList("items");
@@ -92,7 +90,7 @@ public class Main {
 
                 // Releases
                 os = new ByteArrayOutputStream();
-                WebResponse r = c.open("GET", new URI("https://api.github.com/repos/" + fn + "/releases"), os, true);
+                WebResponse r = c.open("GET", new sURL("https://api.github.com/repos/" + fn + "/releases"), os, true);
                 r.auto();
                 rl = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList();
 
@@ -101,7 +99,7 @@ public class Main {
 
                 os = new ByteArrayOutputStream();
 
-                r = c.open("GET", new URI("https://api.github.com/repos/" + fn + "/tags"), os, true);
+                r = c.open("GET", new sURL("https://api.github.com/repos/" + fn + "/tags"), os, true);
                 r.auto();
                 tl = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsList();
 
@@ -132,6 +130,8 @@ public class Main {
         System.gc();
 
         System.out.println("Saving ...");
+        for (final Map.Entry<Version, ArrayList<Item>> e : officials.entrySet())
+            e.getValue().sort(Comparator.comparing(o -> o.repo));
         save("main", officials);
         save("user", communities);
     }

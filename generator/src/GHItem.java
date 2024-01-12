@@ -3,13 +3,12 @@ import Utils.json.Json;
 import Utils.json.JsonDict;
 import Utils.web.WebClient;
 import Utils.web.WebResponse;
+import Utils.web.sURL;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
@@ -22,12 +21,12 @@ public class GHItem {
     public static final String token = System.getenv("token");
 
     public static final WebClient c = new WebClient() {
-        private WebResponse superOpen(final String method, final URL urlAddr, final OutputStream outputStream, final boolean autoCloseStream) throws IOException {
+        private WebResponse superOpen(final String method, final sURL urlAddr, final OutputStream outputStream, final boolean autoCloseStream) throws IOException {
             return super.open(method, urlAddr, outputStream, autoCloseStream);
         }
 
         @Override
-        public WebResponse open(final String method, final URL urlAddr, final OutputStream outputStream, final boolean autoCloseStream) throws IOException {
+        public WebResponse open(final String method, final sURL urlAddr, final OutputStream outputStream, final boolean autoCloseStream) throws IOException {
             return new WebResponse(outputStream) {
                 @Override public void connect(final Map<String, String> headers, final byte[] data) throws IOException, InterruptedException {}
                 @Override public void readAll() throws IOException, InterruptedException {}
@@ -126,7 +125,7 @@ public class GHItem {
         System.out.println(" -  -  - Commit: " + commit);
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        c.open("GET", new URI("https://api.github.com/repos/" + repo + "/git/trees/" + commit + "?recursive=1"), os, true).auto();
+        c.open("GET", new sURL("https://api.github.com/repos/" + repo + "/git/trees/" + commit + "?recursive=1"), os, true).auto();
 
         final JsonDict d = Json.parse(new String(os.toByteArray(), StandardCharsets.UTF_8)).getAsDict();
         if (d.getAsBool("truncated")) {
@@ -140,7 +139,7 @@ public class GHItem {
                 System.out.println(" -  -  - Info: " + f.path);
                 os = new ByteArrayOutputStream();
                 //c.open("GET", new URI("https://api.github.com/repos/" + repo + "/contents/" + f.path + "?ref=" + commit), os, true).auto();
-                c.open("GET", new URI("https://raw.githubusercontent.com/" + repo + "/" + commit + "/" + f.path), os, true).auto();
+                c.open("GET", new sURL("https://raw.githubusercontent.com/" + repo + "/" + commit + "/" + f.path), os, true).auto();
 
                 final IniGroup r = new IniGroup(new String(os.toByteArray(), StandardCharsets.UTF_8), false);
 
